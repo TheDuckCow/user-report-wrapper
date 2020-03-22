@@ -69,11 +69,18 @@ def register():
         bpy.utils.register_class(cls)
 
     # append draw function to the Info Bar > Help dropdown
-    bpy.types.TOPBAR_MT_help.append(menu_append)
+    if hasattr(bpy.types, "INFO_MT_help"): # 2.7x
+        bpy.types.INFO_MT_help.append(menu_append)
+    elif hasattr(bpy.types, "TOPBAR_MT_help"): # 2.8x
+        bpy.types.TOPBAR_MT_help.append(menu_append)
 
 
 def unregister():
     """Unregister the UI and operators"""
-    bpy.types.TOPBAR_MT_help.remove(menu_append)
+    if hasattr(bpy.types, "INFO_MT_help"):
+        bpy.types.INFO_MT_help.remove(menu_append)
+    elif hasattr(bpy.types, "TOPBAR_MT_help"): # 2.8x
+        bpy.types.TOPBAR_MT_help.remove(menu_append)
+
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
