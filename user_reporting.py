@@ -82,6 +82,9 @@ class UserReporter(object):
         self._handling_error = False # used to avoid recursion
         self._form_id = form_id
 
+        # cache a blank url to use in draw code, to avoid computing every draw
+        self.default_form_url = self.get_prefilled_form_url(report="")
+
     def wrapper(self, function, oper, context):
         """Operator execute function wrapper.
 

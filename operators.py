@@ -52,8 +52,10 @@ def menu_append(self, context):
     col = self.layout.column()
     col.operator("object.userreport_no_error")
     col.operator("object.userreport_has_error")
-    ops = col.operator("error_reporter_demo.user_report_popup")
-    ops.error_report = "" # will force user to fill out in form
+
+    # directly open form in browser, prefilling all but the error message field
+    ops = col.operator("wm.url_open", text="Report error")
+    ops.url = user_reporting.Reporter.default_form_url
 
 
 classes = (

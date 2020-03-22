@@ -32,7 +32,7 @@ However when an un-handled exception occurs, the wrapper catches it. It then cal
 
 ### Within the "backend"
 
-When the user clicks "OK" to report an error, it opens a new window or tab of a webbrowser landing on a pre-filled Google Form. The user then presses submit (after optionally adding more details), which then inserts a new row into the Form-connected Google Spreadsheet. The developer could optionally enable notifications for new reports appearing (per new entry or daily summaries).
+When the user clicks "OK" to report an error, it opens a new window or tab of a webbrowser landing on a pre-filled Google Form. The user then presses submit (after optionally adding more details), which then inserts a new row into the Form-connected Google Spreadsheet. The developer could optionally [enable notifications](https://support.google.com/a/users/answer/9308874?hl=en) for new reports appearing (per new entry or daily summaries).
 
 To call this out: This is a very simple backend, and admittedly not a seamless experience for the user as pressing "OK" and the report already being logged. A more sophisticated example would leverage a custom built public read-only API which passes responses through to a database. Though not terribly difficult to setup, this is an extra barrier to entry for quick and simple user reporting, and requires a different set of skills - hence the focus on this repository is on this low tech but straightforward use of spreadsheets.
 
@@ -76,7 +76,7 @@ Key note: Deleting a field is NOT a good idea unless really needed. As you will 
 
 See the [live form](https://docs.google.com/forms/d/e/1FAIpQLSdHTA6aOJCbNsTCpRoWDWheWuQjci1d6gxnxHb1FdAnXvRHdw/viewform) used in this repository's example, noting the one optional question added and the arbitrary question order.
 
-### 5) Generate a pre-filled form link
+### 4) Generate a pre-filled form link
 
 In order for this system to work, we need to deep link the user into a form that already fills out all of the required questions. To do this, we need to get the backend field IDs for each question.
 
@@ -89,7 +89,7 @@ https://docs.google.com/forms/d/e/1FAIpQLSdHTA6aOJCbNsTCpRoWDWheWuQjci1d6gxnxHb1
 ```
 
 
-### 6) Update global variables in `user_reporting.py`
+### 5) Update global variables in `user_reporting.py`
 
 Update each of the following three areas:
 
@@ -104,13 +104,13 @@ From the prefilled url in the previous step, we can see `entry.1215866813=blende
 You can add more if you like, but this only makes sense if you think you can prefill the values of the given field inside blender. Any fields requiring manual user entry can be ignored in the URLs the addon generates.
 
 
-### 6b) [Optional, more advanced] Async integration to submit to form instead of open link
+### 5b) [Optional, more advanced] Async integration to submit to form instead of open link
 
 Just to call this out, if you want to make the process even more seamless, you could directly log the data into a spreadsheet instead of using Forms as a middle-man.
 
 Caution: This would require generating a Google API key for spreadsheets, and this would be public in your addon (and thus potentially abused). If you're going down this route, consider taking it a step further and actually integrate with a live database service instead of forms, but that's your own call.
 
-### 3) Decorate all execute functions
+### 6) Decorate all execute functions
 
 Now add function decorators to every operator function you want to have user error reporting. Or at least the ones you want user reporting for, though there's no particular reason why you would not use it for all operators your addon defines.
 
@@ -132,16 +132,28 @@ class URW_OT_no_error(bpy.types.Operator):
         return {'FINISHED'}
 ```
 
-### 8) Test it!
+### 7) Test it!
 
-Force an operator to fail by throwing an execution with the wrapper enabled, and see it how it responds. You should get a popup, and questions should be prefilled.
+Force an operator to fail by throwing an `Exception` in one of the decorated execute functions of an operator. When next running this operator, you should get a popup. On pressing OK, as browser page should open with questions prefilled.
 
-Note working? Some troubleshooting:
+Not working? Some troubleshooting steps:
 
-- I am not getting a popup: Make sure your addon operator is raising an intentional exception, and that the execute function (not draw or anything else) was properly added. Try restarting blender to fully reload the python modules, as a simple refresh may not work.
-- A browser window is not opening when I press OK: There may be an error happening in the decorator code, double check your blender console to find out what
-- A browser window opens, but shows a broken link ("resource unavailable): Double check to make sure you updated the correct form id. Start with a working (prefilled) link, grab the ID from this.
+- I am not getting a popup: Make sure your addon operator is raising an intentional exception, and that the execute function (not draw function or anything else) was properly added. Try restarting blender to fully reload the python modules, as a simple in-session refresh may not work.
+- A browser window is not opening when I press OK: There may be an error happening in the decorator code, double check your blender console to find out what.
+- A browser window opens, but shows a broken link ("resource unavailable): Double check to make sure you updated the correct form id. Start with a working (prefilled) link, grab the ID from this. Do not grab the ID from the "edit form" url.
 - The form loads, but none or only some of the auto-filled questions are actually auto-filled: Double check the question IDs coming from the prefilled link. This is also a good place to reiterate: deleting questions will remove the question's ID, which cannot be undone.
+
+### 8) (Optional) Add direct reporting function
+
+If you want, you can also add buttons to panels or menus to directly open the reporting Form in a browser. This being said, this would require a user to fill out "error" section of the form, which then won't be in the same format as normal traceback errors like other issues, but is a way to put it all in one place. They still get their blender version, addon version, and platform auto filled out.
+
+To use this, use the sample below in a panel or menu draw function.
+
+```
+# directly open form in browser, prefilling all but the error message field
+ops = col.operator("wm.url_open", text="Report error")
+ops.url = user_reporting.Reporter.default_form_url
+```
 
 ### 9) Reporting and analysis
 

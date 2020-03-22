@@ -21,7 +21,7 @@ bl_info = {
     "name":        "User Report Wrapper Demo",
     "description": "Demo addon showcasing error wrapper handling and reporting",
     "author":      "Patrick W. Crawford",
-    "version":     (0, 0, 1),
+    "version":     (1, 0, 0),
     "blender":     (2, 80, 0),
     "location":    "Info: Help > Report Error",
     "warning":     "",
@@ -47,7 +47,7 @@ def register():
 
 
 def unregister():
-    user_reporting.unregister(user_reporting)
+    user_reporting.unregister()
     operators.unregister()
 
 
