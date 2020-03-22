@@ -26,7 +26,6 @@ class URW_OT_no_error(bpy.types.Operator):
     """An operator which has no errors"""
     bl_idname = "object.userreport_no_error"
     bl_label = "Demo No Error"
-    bl_options = {'REGISTER', 'UNDO'}
 
     @user_reporting.wrapper
     def execute(self, context):
@@ -39,7 +38,6 @@ class URW_OT_has_error(bpy.types.Operator):
     """An operator with an error"""
     bl_idname = "object.userreport_has_error"
     bl_label = "Demo With Error"
-    bl_options = {'REGISTER', 'UNDO'}
 
     @user_reporting.wrapper
     def execute(self, context):

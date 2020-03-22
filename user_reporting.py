@@ -31,7 +31,8 @@ import bpy
 IDNAME = "error_reporter_demo"
 
 # Update the ID from the webform, e.g. from this url
-# https://docs.google.com/forms/d/1Ejf3Vg6TcXAwOmYKY3Nqw78gQGL_LlNl-aZpkRxeA5U/
+# https://docs.google.com/forms/d/e/1FAIpQLSdHTA6aOJCbNsTCpRoWDWheWuQjci1d6gxnxHb1FdAnXvRHdw/viewform?
+# Do NOT take the id from the "edit form" mode.
 FORM_ID = "1FAIpQLSdHTA6aOJCbNsTCpRoWDWheWuQjci1d6gxnxHb1FdAnXvRHdw"
 
 # Update these IDs to match the prefilled form
@@ -72,10 +73,6 @@ class UserReporter(object):
         except Exception as err:
             print("Error getting platform info: " + str(err))
             os_platform = "unknown:unknown"
-
-        # Public
-        self.verbose = True
-        self.dev = False
 
         # Private
         self._addon = __package__.lower()
@@ -131,7 +128,6 @@ class UserReporter(object):
         error = self._remove_path_prefix(err)
 
         # cut off the first three lines of error, which is this wrapper
-        # TODO: use better grabbing via function traceback
         nth_newline = 0
         for ind in range(len(err)):
             if err[ind] in ["\n", "\r"]:
